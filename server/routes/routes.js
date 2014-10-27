@@ -1,6 +1,5 @@
 'use strict';
 
-var path  = require('path');
 //== Load data contollers
 var fetch = require('../controllers/data-fetch');
 var store = require('../controllers/data-store');
@@ -18,13 +17,24 @@ module.exports.initialize = function (app) {
     //== Front-end routes ==
     //======================
     app.get('*', function (req, res) {
-    	var indexPage = path.resolve('./client/views/index.html');
-        res.sendFile(indexPage);
+        //== Retrieve the username and pas it to the index template
+        var username = req.body._username;
+        if (!username) {
+            username = 'Unknown User';
+        }
+        res.render('index', {
+            username: username
+        });
     });
     app.post('*', function (req, res) {
-        // TODO: Parse data from SSO and create a user session
-        var indexPage = path.resolve('./client/views/index.html');
-        res.sendFile(indexPage);
+        //== Retrieve the username and pas it to the index template
+        var username = req.body._username;
+        if (!username) {
+            username = 'Unknown User';
+        }
+        res.render('index', {
+        username: username
+        });
     });
 
 };

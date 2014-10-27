@@ -1,5 +1,5 @@
 'use strict';
 
 module.exports = {
-	url: 'mongodb://localhost/clearview-js'
-}
+    url: 'mongodb://localhost/clearview-js'
+};

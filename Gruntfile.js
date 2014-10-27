@@ -1,5 +1,7 @@
 
-module.exports = function(grunt) {
+'use strict';
+
+module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
@@ -12,7 +14,7 @@ module.exports = function(grunt) {
                 options: {
                     logConcurrentOutput: true
                 },
-                tasks: ['watch', 'nodemon:dev']
+                tasks: ['jshint:serverjs', 'watch', 'nodemon:dev']
             }
         },
 
@@ -20,16 +22,22 @@ module.exports = function(grunt) {
         //== Node app control ==
         //======================
         nodemon: {
-            //== Monitor the dev Node app for Node file updates
+            //== Monitor the dev Node app for server file updates
             dev: {
                 script: './bin/www',
+                // TODO: Fix nodemon restarting even if server js linting fails
                 options: {
-                    ignore: [ '.git/**/*',
-                              'node_modules/**/*',
+                    ignore: [ '.bower-*/',
+                              '.git/**/*',
+                              'bower_components/**/*',
                               'client/**/*',
+                              'node_modules/**/*',
                               '.bowerrc',
+                              '.csslintrc',
+                              '.gitignore',
+                              '.jshintignore',
+                              '.jshintrc',
                               'bower.json',
-                              'Gruntfile.js',
                               'package.json',
                               'npm_debug.log',
                               'README.md',
@@ -43,31 +51,92 @@ module.exports = function(grunt) {
         //== Watch files ==
         //=================
         watch: {
-            //== Rebuild the CSS min file after CSS edits
+            //== Re-compile the LESS files to CSS after LESS updates
+            less: {
+                files: ['client/assets/css/less/*.less'],
+                tasks: ['less:dev'],
+                options: {
+                    spawn: true
+                }
+            },
+            //== Lint and re-build the CSS .min file after CSS updates
             css: {
-                files: ['client/assets/css/*.css', 'client/assets/css/less/*.less'],
-                tasks: ['concat:css', 'cssmin'], // TODO: Add LESS task here
+                files: ['client/assets/css/*.css'],
+                tasks: ['csslint:strict', 'concat:css', 'cssmin', 'copy:fonts'],
                 options: {
                     spawn: true
                 }
             },
-            //== Rebuild the JS min file after JS edits
-            js: {
-                files: ['client/assets/js/*.js'], //TODO: Add Angular files here
-                tasks: ['concat:js', 'uglify'],
+            //== Lint and re-build the client JS .min file after client JS updates
+            clientjs: {
+                files: ['client/**/*.js'],
+                tasks: ['jshint:clientjs', 'concat:js', 'uglify'],
                 options: {
                     spawn: true
                 }
             },
+            serverjs: {
+                files: ['Gruntfile.js', 'server/**/*.js'],
+                tasks: ['jshint:serverjs'],
+                options: {
+                    spawn: true
+                }
+            },
+            //== Reload the web page after updates to CSS, JS, and HTML builds
             livereload: {
                 options: { livereload: true },
-                files: ['client/assets/build/**/*', 'client/views/*.html']
+                files: ['client/assets/css/build/**/*.css', 'client/assets/js/build/**/*.js', 'client/views/*.html'] // TODO: Watch pre-compiled Angular HTML templates
             }
         },
 
         //=====================
         //== LESS Processing ==
         //=====================
+        less: {
+            dev: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'client/assets/css/less/',
+                        src: ['global.less'],
+                        dest: 'client/assets/css/',
+                        ext: '.css'
+                    }
+                ]
+            }
+        },
+
+        //==============
+        //== CSS Lint ==
+        //==============
+        csslint: {
+            options: {
+                csslintrc: '.csslintrc'
+            },
+            strict: {
+                options: {
+                    import: 2
+                },
+                src: ['client/assets/css/*.css', '!client/assets/css/build/*.css']
+            },
+            lax: {
+                options: {
+                    import: false
+                },
+                src: ['client/assets/css/*.css', '!client/assets/css/build/*.css']
+            }
+        },
+
+        //========================
+        //== JavaScript Linting ==
+        //========================
+        jshint: {
+            options: {
+                jshintrc: '.jshintrc'
+            },
+            serverjs: ['server/**/*.js'],
+            clientjs: ['client/**/*.js', '!client/assets/js/build/*.js']
+        },
 
         //========================
         //== File concatination ==
@@ -77,29 +146,24 @@ module.exports = function(grunt) {
             css: {
                 src: [
                     'bower_components/bootstrap/dist/css/bootstrap.css',
+                    'bower_components/font-awesome/css/font-awesome.css',
+                    'client/assets/css/global.css',
                     'client/assets/css/style.css',
                     'client/assets/css/style-mq.css'
                 ],
                 dest: 'client/assets/css/build/application.css'
             },
-            //== Concat the JS files
+            //== Concat the client JS files
             js: {
                 src: [
                     'bower_components/jquery/dist/jquery.js',
-                    'bower_components/bootstrap/dist/js/bootstrap.js', //TODO: Add Angular files here
+                    'bower_components/bootstrap/dist/js/bootstrap.js',
+                    // TODO: Add Angular files here
                     'client/assets/js/custom.js'
                 ],
                 dest: 'client/assets/js/build/application.js'
             }
         },
-
-        //==============
-        //== CSS Lint ==
-        //==============
-
-        //=====================
-        //== JavaScript Lint ==
-        //=====================
 
         //======================
         //== CSS minification ==
@@ -123,7 +187,19 @@ module.exports = function(grunt) {
                 src:  'client/assets/js/build/application.js',
                 dest: 'client/assets/js/build/application.min.js'
             }
-        }
+        },
+
+        //================
+        //== Copy files ==
+        //================
+        copy: {
+            fonts: {
+                expand: true,
+                cwd:    'bower_components/font-awesome/fonts/',
+                src:    '**',
+                dest:   'client/assets/css/fonts/'
+            }
+        },
 
         //======================
         //== JavaScript tests ==
@@ -142,6 +218,6 @@ module.exports = function(grunt) {
     //== Default task
     grunt.registerTask('default', ['']);
     //== Dev task (Prepare assets, start application, watch for changes)
-    grunt.registerTask('dev', ['concat:css', 'cssmin', 'concat:js', 'uglify', 'concurrent:dev']);
-    
+    grunt.registerTask('dev', ['less:dev', 'csslint:strict', 'concat:css', 'cssmin', 'jshint:clientjs', 'concat:js', 'uglify', 'copy:fonts', 'concurrent:dev']);
+
 };
