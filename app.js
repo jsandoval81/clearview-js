@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 //== Have Express serve static assets (web server application should do this in production)
-app.use(express.static(path.join(__dirname, 'client/assets')));
+app.use(express.static(path.join(__dirname, 'client')));
 //== Give Express a default view engine for rendering the index page
 app.set('views', path.join(__dirname, 'client/views'));
 app.set('view engine', 'ejs');

@@ -27,7 +27,7 @@ module.exports = function (grunt) {
                 script: './bin/www',
                 // TODO: Fix nodemon restarting even if server js linting fails
                 options: {
-                    ignore: [ '.bower-*/',
+                    ignore: [ '.bower-*/**/*',
                               '.git/**/*',
                               'bower_components/**/*',
                               'client/**/*',
@@ -127,15 +127,15 @@ module.exports = function (grunt) {
             }
         },
 
-        //========================
-        //== JavaScript Linting ==
-        //========================
+        //=====================
+        //== JavaScript Lint ==
+        //=====================
         jshint: {
             options: {
                 jshintrc: '.jshintrc'
             },
             serverjs: ['server/**/*.js'],
-            clientjs: ['client/**/*.js', '!client/assets/js/build/*.js']
+            clientjs: ['client/**/*.js', '!client/assets/js/build/*.js', '!client/assets/js/angular.js']
         },
 
         //========================
@@ -198,6 +198,12 @@ module.exports = function (grunt) {
                 cwd:    'bower_components/font-awesome/fonts/',
                 src:    '**',
                 dest:   'client/assets/css/fonts/'
+            },
+            angular: {
+                expand: true,
+                cwd:    'bower_components/angular/',
+                src:    'angular.js',
+                dest:   'client/assets/js/'
             }
         },
 
@@ -218,6 +224,16 @@ module.exports = function (grunt) {
     //== Default task
     grunt.registerTask('default', ['']);
     //== Dev task (Prepare assets, start application, watch for changes)
-    grunt.registerTask('dev', ['less:dev', 'csslint:strict', 'concat:css', 'cssmin', 'jshint:clientjs', 'concat:js', 'uglify', 'copy:fonts', 'concurrent:dev']);
+    grunt.registerTask('dev', [ 'copy:fonts',
+                                'copy:angular',
+                                'less:dev',
+                                'csslint:strict',
+                                'concat:css',
+                                'cssmin',
+                                'jshint:clientjs',
+                                'concat:js',
+                                'uglify',
+                                'concurrent:dev'
+                                ]);
 
 };

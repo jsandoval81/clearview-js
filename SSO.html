@@ -3,7 +3,7 @@
 <html>
 
     <head>
-        <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+        <link rel="stylesheet" href="/assets/css/build/application.min.css" />
     </head>
 
     <body>
@@ -18,22 +18,21 @@
             <div class="row">
                 <div class="col-sm-3"></div>
                 <div class="col-sm-6 jumbotron text-center">
-                    <form name="sso-form" method="post" action="http://localhost:3000">
+                    <form name="sso-form" method="post" action="http://localhost:3000/session-init">
                         <div class="form-group">
-                            <label for="_username">Username:</label>
-                            <input type="text" name="_username" class="form-control" autofocus="autofocus">
+                            <label for="username">Username:</label>
+                            <input type="text" name="username" class="form-control" autofocus="autofocus">
                         </div>
                         <button type="submit" class="btn btn-warning">Sign On</button>
                     </form>
-                    <br /><a href="http://localhost:3000">Go straight to app</a>
+                    <br /><a href="http://localhost:3000/session-init">Go straight to app</a>
                 </div>
                 <div class="col-sm-3"></div>
             </div>
 
         </div>
 
-        <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
-        <script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script src="/assets/js/build/application.min.js"></script>
     </body>
 
 </html>
