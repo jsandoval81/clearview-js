@@ -14,7 +14,7 @@ module.exports = function (grunt) {
                 options: {
                     logConcurrentOutput: true
                 },
-                tasks: ['jshint:serverjs', 'watch', 'nodemon:dev']
+                tasks: ['jshint:serverjs', 'watch', 'nodemon:dev', 'mochaTest']
             }
         },
 
@@ -134,7 +134,7 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            serverjs: ['server/**/*.js'],
+            serverjs: ['server/**/*.js', '!server/tests/**/*'],
             clientjs: ['client/**/*.js', '!client/assets/js/build/*.js', '!client/assets/js/angular.js']
         },
 
@@ -207,9 +207,17 @@ module.exports = function (grunt) {
             }
         },
 
-        //======================
-        //== JavaScript tests ==
-        //======================
+        //==================
+        //== Server tests ==
+        //==================
+        mochaTest: {
+            options: {
+                reporter: 'spec',
+                captureFile: 'test-results.txt',
+                clearRequireCache: true
+            },
+            src: ['server/tests/*.js']
+        }
 
     });
 

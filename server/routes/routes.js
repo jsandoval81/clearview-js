@@ -19,15 +19,13 @@ module.exports.initialize = function (app) {
     //======================
     app.post('*', function (req, res) {
         //== Retrieve the username and pass it to the index template
-        var username  = req.body._username,
-            indexPage = path.resolve('client/views/index.html');
+        var username  = req.body.username;
         if (!username) {
             username = 'Unknown User';
         }
-        res.sendFile(indexPage, { username: username });
-        /*res.render('index', {
+        res.render('index', {
             username: username
-        });*/
+        });
     });
     app.get('*', function (req, res) {
         var ssoPage = path.resolve('SSO.html');
