@@ -69,7 +69,7 @@ module.exports = function (grunt) {
             },
             //== Lint and re-build the client JS .min file after client JS updates
             clientjs: {
-                files: ['client/**/*.js'],
+                files: ['client/**/*.js', '!client/assets/js/build/**/*', '!client/tests/**/*.js'],
                 tasks: ['jshint:clientjs', 'concat:js', 'uglify'],
                 options: {
                     spawn: true
@@ -85,7 +85,7 @@ module.exports = function (grunt) {
             //== Reload the web page after updates to CSS, JS, and HTML builds
             livereload: {
                 options: { livereload: true },
-                files: ['client/assets/css/build/**/*.css', 'client/assets/js/build/**/*.js', 'client/views/*.html'] // TODO: Watch pre-compiled Angular HTML templates
+                files: ['client/assets/css/build/**/*.css', 'client/assets/js/build/**/*.js', 'client/views/*.html', 'client/views/*.ejs']
             }
         },
 
@@ -134,8 +134,8 @@ module.exports = function (grunt) {
             options: {
                 jshintrc: '.jshintrc'
             },
-            serverjs: ['server/**/*.js', '!server/tests/**/*'],
-            clientjs: ['client/**/*.js', '!client/assets/js/build/*.js', '!client/assets/js/angular.js']
+            serverjs: ['server/**/*.js'],
+            clientjs: ['client/**/*.js', '!client/assets/js/build/*.js', '!client/tests/**/*.js']
         },
 
         //========================
@@ -156,9 +156,8 @@ module.exports = function (grunt) {
             //== Concat the client JS files
             js: {
                 src: [
-                    'bower_components/jquery/dist/jquery.js',
-                    'bower_components/bootstrap/dist/js/bootstrap.js',
-                    // TODO: Add Angular files here
+                    'bower_components/angular/angular.js',
+                    'client/controllers/main.js',
                     'client/assets/js/custom.js'
                 ],
                 dest: 'client/assets/js/build/application.js'
@@ -207,9 +206,9 @@ module.exports = function (grunt) {
             }
         },
 
-        //==================
-        //== Server tests ==
-        //==================
+        //======================
+        //== JavaScript tests ==
+        //======================
         mochaTest: {
             options: {
                 reporter: 'spec',
@@ -217,6 +216,11 @@ module.exports = function (grunt) {
                 clearRequireCache: true
             },
             src: ['server/tests/*.js']
+        },
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js'
+            }
         }
 
     });
@@ -231,6 +235,8 @@ module.exports = function (grunt) {
     //====================
     //== Default task
     grunt.registerTask('default', ['']);
+    //== Test task (Run server and client tests)
+    grunt.registerTask('test', ['karma:unit']);
     //== Dev task (Prepare assets, start application, watch for changes)
     grunt.registerTask('dev', [ 'copy:fonts',
                                 'copy:angular',

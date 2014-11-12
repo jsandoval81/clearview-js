@@ -1,16 +1,39 @@
 <!doctype html>
 <html lang="en" data-ng-app="clearviewApp">
 <head>
-    <meta charset="UTF-8">
-    <script src="/assets/js/build/application.min.js"></script>
-    <link rel="stylesheet" href="/assets/css/build/application.min.css" />
+    <meta charset="utf-8">
     <title>ClearView</title>
-
+    <link rel="stylesheet" href="/css/build/application.min.css" />
+    <script src="/js/build/application.min.js"></script>
 </head>
 <body>
 
+    <!-- Example of font-awesome usage -->
     <span class="fa fa-bar-chart"></span>
-    <div><%= username %></div>
 
+    <!-- Example of EJS expression -->
+    <%= username %>
+
+    <!-- Example of Angular expression -->
+    {{ 'hello' + ' there' }}
+
+    <div data-ng-controller="SampleListCtrl">
+        Sort by:
+        <select data-ng-model="reportOrder">
+            <option value="name">Name</option>
+            <option value="age">Age</option>
+        </select>
+
+        <ul>
+            <li data-ng-repeat="report in reports | orderBy:reportOrder">
+                <span>Report name: {{ report.name }}</span>
+                <p>Report description: {{ report.description }}</p>
+                <p>Age: {{ report.age }}</p>
+            </li>
+        </ul>
+    </div>
+
+
+    <script src="//localhost:35729/livereload.js"></script>
 </body>
 </html>

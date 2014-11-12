@@ -9,3 +9,8 @@ node_modules/**/*
 # --------------------
 .bower-*/
 bower_components
+
+# --------------------
+# Test Coverage Reports
+# --------------------
+client/tests/coverage
